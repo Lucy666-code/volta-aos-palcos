@@ -1,0 +1,20 @@
+VOLTA AOS PALCOS - versão offline (PWA)
+
+Para o iPhone instalar como app, os arquivos precisam estar num site https (gratuito).
+Depois da primeira abertura com internet, tudo funciona sem internet e sem depender do Claude.
+
+COMO COLOCAR NO AR (escolha um):
+1) Netlify: entre em netlify.com, abra "Sites" e arraste esta pasta inteira. Crie conta gratuita para o site não expirar.
+2) Cloudflare Pages: crie um projeto "Direct Upload" e envie esta pasta.
+3) GitHub Pages: crie um repositório, envie estes arquivos e ative Pages nas configurações.
+
+COMO INSTALAR NO IPHONE:
+1) Abra o link do site no Safari (com internet).
+2) Toque em Compartilhar > Adicionar à Tela de Início.
+3) Abra o app pela tela de início uma vez com internet. Em Ajustes deve aparecer "Pronto: funciona sem internet".
+
+DADOS:
+- Tudo fica salvo no seu aparelho. Use Ajustes > Backup dos dados para guardar uma cópia.
+- Google Calendar: sem o Claude não há conexão direta. Use Importar/Exportar .ics em Ajustes. Os botões "+ Google" abrem o Google Calendar quando você tem internet.
+
+ATUALIZAR: ao trocar arquivos, mude o número em sw.js (var V="vp-v8" -> "vp-v9") para o iPhone baixar a versão nova.
