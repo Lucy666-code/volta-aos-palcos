@@ -308,3 +308,5 @@ body.sho #app{transform:scale(.93);border-radius:28px}
 @keyframes v5rise{from{transform:translate3d(calc(var(--d5,0)*16px),8px,0) scale(.992)}to{transform:none}}
 #app.v5in>*{animation:v5rise .42s var(--e5o) both!important;animation-delay:0s!important}
 #app.v5in .grp>.row{animation:none!important}
+@keyframes h1in{from{transform:translateY(8px)}to{transform:none}}
+#app.v5in .hdl h1{animation:h1in .45s var(--e5o) both!important}

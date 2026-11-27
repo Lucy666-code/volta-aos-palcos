@@ -24,7 +24,7 @@ function v5pill(q){var d=$("dock");if(!d)return;var p=d.querySelector(".dp"),as=
 /* ---------- Troca de tela: a atual sai pro lado, os cartões da nova sobem em cascata ---------- */
 swapTab=function(t){var a=$("app"),ni=0,oi=0;TABS.forEach(function(x,k){if(x[0]==t)ni=k;if(x[0]==tab)oi=k});var dir=ni>oi?1:ni<oi?-1:0;v5mark(t);
  tab=t;ANIM=true;V5.in=dir||0.001;window.scrollTo(0,0);render();try{aim();cur=tgt;shown=Math.round(cur*(N-1));draw()}catch(e){}};
-var _r5=render;render=function(){var an=ANIM;_r5();v5dock();var a=$("app");if(an&&!RM){var d=V5.in||0;V5.in=0;a.style.setProperty("--d5",Math.round(d));var k=0;[].forEach.call(a.children,function(c){c.style.setProperty("--k",Math.min(k++,12))});a.classList.remove("v5in");void a.offsetWidth;a.classList.add("v5in");clearTimeout(V5.it);V5.it=setTimeout(function(){a.classList.remove("v5in")},800)}};
+var _r5=render;render=function(){var an=ANIM;_r5();v5dock();var a=$("app");if(!an)a.classList.remove("v5in");if(an&&!RM){var d=V5.in||0;V5.in=0;a.style.setProperty("--d5",Math.round(d));var k=0;[].forEach.call(a.children,function(c){c.style.setProperty("--k",Math.min(k++,12))});a.classList.remove("v5in");void a.offsetWidth;a.classList.add("v5in");}};
 
 /* ---------- Toque nos botões: afunda, volta com mola e solta um anel de luz ---------- */
 (function(){var SEL=".btn,.chip,.fab,.ib,.wsd,.air,.aiq button,.oidea button,.pk button,.v5k,#dock a,.seg button,.chk,.shok";
