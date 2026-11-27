@@ -44,9 +44,8 @@ body.sho .fab{transform:scale(.6)!important;opacity:0;pointer-events:none}
 
 /* ---------- Troca de tela ---------- */
 #app,main#app{animation:none!important}
-#app.v5out{transition:opacity .18s ease-in,transform .18s ease-in,filter .18s;opacity:0;transform:translate3d(calc(var(--d5,0)*-26px),6px,0) scale(.985);filter:blur(6px)}
-#app.v5in>*{animation:v5rise .7s var(--e5o) both;animation-delay:calc(var(--k,0)*42ms)}
-@keyframes v5rise{from{opacity:0;transform:translate3d(calc(var(--d5,0)*30px),22px,0) scale(.965);filter:blur(7px)}60%{filter:blur(0)}to{opacity:1;transform:none;filter:none}}
+#app.v5in>*{animation:v5rise .46s var(--e5o) both;animation-delay:calc(min(var(--k,0),6)*28ms)}
+@keyframes v5rise{from{opacity:0;transform:translate3d(calc(var(--d5,0)*22px),10px,0)}to{opacity:1;transform:none}}
 
 /* ---------- Botões: mais vivos ---------- */
 .btn,.chip,.ib,.v5k,.air .btn{transition:transform .5s var(--e5),box-shadow .35s,background .3s,color .3s!important}
@@ -92,10 +91,6 @@ body.sho #app{transform:scale(.93);border-radius:28px}
 .aih{display:flex;gap:14px;align-items:center;margin-bottom:14px}
 .aih b{display:block;font-size:max(12px,calc(19px*var(--fs)));letter-spacing:-.02em;margin:2px 0 3px}
 .aih .mono{color:var(--ac);letter-spacing:.16em}
-.aio{position:relative;width:46px;height:46px;flex:none;border-radius:50%;background:conic-gradient(from 0deg,var(--ac),#fff,color-mix(in srgb,var(--ac) 40%,#7a5cff),var(--ac));animation:v5orb 7s linear infinite;box-shadow:0 0 26px -4px var(--acg),inset 0 0 12px rgba(0,0,0,.4)}
-.aio::before{content:"";position:absolute;inset:3px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55),transparent 40%),radial-gradient(circle at 60% 70%,color-mix(in srgb,var(--ac) 60%,transparent),#0b0b10 75%)}
-.aio i{position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--acm);animation:v5ring 2.4s var(--e5o) infinite}
-.aio.sm{width:34px;height:34px}
 @keyframes v5orb{to{transform:rotate(360deg)}}
 @keyframes v5ring{0%{transform:scale(.8);opacity:.9}100%{transform:scale(1.35);opacity:0}}
 .ail{display:flex;flex-direction:column;gap:8px}
@@ -284,3 +279,32 @@ body.sho #app{transform:scale(.93);border-radius:28px}
 @media (hover:hover){.v5min:hover .aich{color:#fff;transform:rotate(90deg) translateX(2px)}}
 .v5ai:not(.v5min){animation:v5open .5s var(--e5o)}
 @keyframes v5open{from{opacity:.4;transform:scale(.98)}to{opacity:1;transform:none}}
+
+/* sem vidro nos cartões da página: evita o "flash" na troca e deixa mais leve */
+#app .grp{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background-color:rgba(17,17,20,.9)}
+#app .hdl h1{animation:h1in .7s var(--ease) both!important}
+@keyframes h1in{from{opacity:0;transform:translateY(10px);letter-spacing:.02em}to{opacity:1;transform:none;letter-spacing:-.032em}}
+
+/* ---------- Orbe do assistente ---------- */
+.aio{position:relative;width:46px;height:46px;flex:none;border-radius:50%;display:grid;place-items:center;isolation:isolate;
+ background:radial-gradient(circle at 50% 120%,color-mix(in srgb,var(--ac) 55%,#000),#07070b 70%);
+ box-shadow:0 0 0 1px rgba(255,255,255,.14),0 0 0 4px color-mix(in srgb,var(--ac) 10%,transparent),0 8px 22px -6px var(--acg),0 0 40px -12px var(--ac)}
+.aio .ob{position:absolute;inset:0;border-radius:50%;overflow:hidden;z-index:-1}
+.aio .ob b{position:absolute;width:70%;height:70%;border-radius:50%;filter:blur(7px);mix-blend-mode:screen;animation:v5blob 7s ease-in-out infinite}
+.aio .ob b:nth-child(1){left:-6%;top:-4%;background:var(--ac)}
+.aio .ob b:nth-child(2){right:-10%;top:20%;background:#8a6bff;animation-duration:9s;animation-direction:reverse}
+.aio .ob b:nth-child(3){left:18%;bottom:-18%;background:#ff7ad9;opacity:.7;animation-duration:11s;animation-delay:-3s}
+.aio::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(70% 55% at 35% 22%,rgba(255,255,255,.55),rgba(255,255,255,.08) 45%,transparent 60%);pointer-events:none}
+.aio::after{content:"";position:absolute;inset:-5px;border-radius:50%;padding:1.5px;background:conic-gradient(from var(--ga,0deg),transparent 0 55%,color-mix(in srgb,var(--ac) 90%,#fff) 80%,transparent 95%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:v5spin 3.2s linear infinite}
+.aio svg{width:46%;height:46%;fill:#fff;filter:drop-shadow(0 0 4px rgba(255,255,255,.9)) drop-shadow(0 0 10px var(--ac));animation:v5twk 3.6s ease-in-out infinite}
+.aio.sm{width:36px;height:36px}
+.aio.sm::after{inset:-4px}
+@keyframes v5blob{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(22%,14%) scale(1.15)}66%{transform:translate(-8%,24%) scale(.9)}}
+@keyframes v5twk{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.12) rotate(12deg)}}
+@media (prefers-reduced-motion:reduce){.aio .ob b,.aio::after,.aio svg{animation:none}}
+#app.v5in>.hd{animation:none!important}
+#app.v5in>.hd .hdl h1{animation:h1in .45s var(--e5o) both!important}
+@keyframes v5rise{from{opacity:.15;transform:translate3d(calc(var(--d5,0)*20px),10px,0)}to{opacity:1;transform:none}}
+@keyframes v5rise{from{transform:translate3d(calc(var(--d5,0)*16px),8px,0) scale(.992)}to{transform:none}}
+#app.v5in>*{animation:v5rise .42s var(--e5o) both!important;animation-delay:0s!important}
+#app.v5in .grp>.row{animation:none!important}
