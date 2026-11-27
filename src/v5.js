@@ -59,8 +59,9 @@ function v5brain(){var td=today(),L=[],it=dayItems(td),late=v5late(),bk=S.tasks.
 function v5sum(){var td=today(),it=dayItems(td),tk=it.tk.filter(function(t){return!t.done}).length,ev=it.ev.length,ng=v5gigs()[0],s=[];
  s.push(tk||ev?"Hoje: "+[tk?pl(tk,"tarefa","tarefas"):"",ev?pl(ev,"evento","eventos"):""].filter(Boolean).join(" e ")+".":"Nada marcado pra hoje.");
  if(ng){var n=v5dd(td,ng.at.slice(0,10));s.push(n==0?"É dia de gig: "+ng.t+".":n==1?"Amanhã tem "+ng.t+".":"Faltam "+n+" dias pra "+ng.t+".")}return s.join(" ")}
-function v5asst(){var L=v5brain(),nm=(S.cfg.name||"").trim().split(/\s+/)[0],sh=V5.ai?L:L.slice(0,3);
- var h='<div class="grp v5ai"><div class="aih"><span class="aio" aria-hidden="true"><i></i></span><div class="grow"><div class="mono">Assistente</div><b>'+v5hi()+(nm?", "+esc(nm.charAt(0)+nm.slice(1).toLowerCase()):"")+'.</b><div class="s">'+esc(v5sum())+"</div></div></div>";
+function v5tg(){var o=!lsg("vp-ai-open");try{localStorage.setItem("vp-ai-open",o?"1":"")}catch(e){}var y=scrollY;render();scrollTo(0,y)}
+function v5asst(){if(!lsg("vp-ai-open")){var L0=v5brain(),u=L0.filter(function(x){return x.p==0}).length;return'<button class="grp v5ai v5min" onclick="v5tg()" aria-expanded="false"><span class="aio sm" aria-hidden="true"><i></i></span><div class="grow"><div class="mono">Assistente</div><b>'+(L0.length?esc(L0[0].t):"Tudo em dia")+'</b></div>'+(L0.length?'<span class="aib'+(u?" hot":"")+'">'+L0.length+"</span>":"")+ic("chevR","aich")+"</button>"}var L=v5brain(),nm=(S.cfg.name||"").trim().split(/\s+/)[0],sh=V5.ai?L:L.slice(0,3);
+ var h='<div class="grp v5ai"><div class="aih" onclick="v5tg()" style="cursor:pointer" title="Minimizar"><span class="aio" aria-hidden="true"><i></i></span><div class="grow"><div class="mono">Assistente</div><b>'+v5hi()+(nm?", "+esc(nm.charAt(0)+nm.slice(1).toLowerCase()):"")+'.</b><div class="s">'+esc(v5sum())+"</div></div>"+ic("chevR","aich up")+"</div>";
  h+=L.length?'<div class="ail">'+sh.map(function(x,i){return'<div class="air'+(x.c?" "+x.c:"")+'" style="--k:'+i+'"><span class="aii">'+ic(x.i)+'</span><div class="grow"><b>'+esc(x.t)+'</b><div class="s">'+esc(x.s)+'</div></div><button class="btn sm" onclick="'+x.f+'">'+x.a+"</button></div>"}).join("")+(L.length>3?'<button class="aim" onclick="V5.ai=!V5.ai;render()">'+(V5.ai?"Mostrar menos":"Mais "+(L.length-3)+" sugest"+(L.length-3==1?"ão":"ões"))+"</button>":"")+"</div>":'<div class="ail"><div class="air ok"><span class="aii">'+ic("check")+'</span><div class="grow"><b>Tudo em dia</b><div class="s">Nada atrasado, nada sem data. Bom trabalho.</div></div></div></div>';
  return h+'<div class="aiq"><button onclick="v5org()">'+ic("spark")+'Organizar semana</button><button onclick="v5ideas()">'+ic("play")+'Ideias de post</button><button onclick="v5gpick()">'+ic("target")+"Plano pra objetivo</button></div></div>"}
 
@@ -118,8 +119,8 @@ var _gc5=goalCard;goalCard=function(g,full){var h=_gc5(g,full);if(!full)return h
 
 /* Painel e Semana recebem o assistente */
 planBlock=function(){return""};
-var _pp5=pPainel;pPainel=function(){var h=_pp5(),i=h.indexOf('<div class="strip">');var a=v5asst()+v5rhythm();return i<0?a+h:h.slice(0,i)+a+h.slice(i)};
-var _ps5=pSemana;pSemana=function(){var h=_ps5();if(SEG.s!="sem")return h;var i=h.indexOf('<div class="wact">');return i<0?h:h.slice(0,i)+v5asst()+h.slice(i)};
+var _pp5=pPainel;pPainel=function(){var h=_pp5(),i=h.indexOf('<div class="strip">');var a=v5asst();return i<0?a+h:h.slice(0,i)+a+h.slice(i)};
+
 
 /* ritmo: 7 dias em barras + objetivos */
 function v5rhythm(){var st=wkStart(0),td=today(),B=[],mx=1,dn=0,tt=0;for(var i=0;i<7;i++){var d=new Date(st);d.setDate(st.getDate()+i);var k=iso(d),it=dayItems(k),a=it.tk.length,b=it.tk.filter(function(t){return t.done}).length;mx=Math.max(mx,a);dn+=b;tt+=a;B.push({k:k,a:a,b:b,l:DIAS[d.getDay()].charAt(0)})}
