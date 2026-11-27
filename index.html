@@ -544,38 +544,48 @@ function gcal(title,when,det,loc,all){var d=new Date(when),f=function(x){return 
 /* Google Calendar via conector */
 /* Login do Google direto no app (OAuth no navegador, sem servidor) */
 var GCID="91813319006-3cf12jbkdfb5rsks25mvdc56re15207r.apps.googleusercontent.com",GSCOPE="https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/drive.appdata",GTK="vp-gtok";
+(function(){var u=new URLSearchParams(location.search);if(!u.get("code")&&!u.get("error"))return;var st="";try{st=localStorage.getItem("vp-gst")||"";localStorage.removeItem("vp-gst")}catch(e){}var q=u.get("state")||"",back=q.split("|")[1]||"gigs";if(u.get("code")&&q.split("|")[0]==st)window.__gcode=u.get("code");else window.__gerr=u.get("error")||"estado";history.replaceState(null,"",location.pathname+"#"+back)})();
 (function(){var h=location.hash;if(h.indexOf("access_token=")<0&&h.indexOf("error=")<0)return;var q={};h.slice(1).split("&").forEach(function(kv){var i=kv.indexOf("=");q[decodeURIComponent(kv.slice(0,i))]=decodeURIComponent(kv.slice(i+1))});
  var st="";try{st=localStorage.getItem("vp-gst")||"";localStorage.removeItem("vp-gst")}catch(e){}
  var back=(q.state||"").split("|")[1]||"gigs",sil=(q.state||"").split("|")[2]=="s";
  if(q.access_token&&q.state&&q.state.split("|")[0]==st){try{localStorage.setItem(GTK,JSON.stringify({t:q.access_token,s:q.scope||"",x:Date.now()+(+q.expires_in||3600)*1e3-6e4}))}catch(e){}window.__gok=sil?2:1}else if(sil)window.__gsil=1;else window.__gerr=q.error||"estado";
  history.replaceState(null,"",location.pathname+"#"+back)})();
 function gTok(){try{var o=JSON.parse(localStorage.getItem(GTK)||"null");if(o&&o.t&&o.x>Date.now())return o.t}catch(e){}return null}
+/* Renovação automática: o Worker guarda a chave secreta e troca o refresh token (criptografado, salvo só neste aparelho) por um acesso novo */
+var GWK="https://volta-aos-palcos-login.whosazzura666.workers.dev",GRT="vp-grt",GRP=null,GRDR=location.origin+location.pathname.replace(/index\.html$/,"");
+function gRt(){try{return localStorage.getItem(GRT)}catch(e){return null}}
+async function gW(p,b){var r=await fetch(GWK+p,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(b)});var j={};try{j=await r.json()}catch(e){}return{ok:r.ok,s:r.status,j:j}}
+function gRefresh(){var rt=gRt();if(!rt||!navigator.onLine)return Promise.resolve(null);if(GRP)return GRP;
+ GRP=gW("/refresh",{rt:rt}).then(function(x){if(x.ok&&x.j.access_token){gSet(x.j.access_token,x.j.scope||GSCOPE,x.j.expires_in);return x.j.access_token}if(x.j.error=="invalid_grant"){try{localStorage.removeItem(GRT)}catch(e){}rIf()}return null},function(){return null}).then(function(t){GRP=null;return t});return GRP}
+async function gTokA(){return gTok()||await gRefresh()}
+async function gExch(code,ru,man){try{var x=await gW("/exchange",{code:code,redirect_uri:ru});if(!x.ok||!x.j.access_token)throw 0;if(x.j.rt)try{localStorage.setItem(GRT,x.j.rt)}catch(e){}gSet(x.j.access_token,x.j.scope||GSCOPE,x.j.expires_in);if(man)toast("Google conectado");rIf();cloudSync(!!man).then(function(){if(man||S.gcon)sync(!!man)})}catch(e){if(man)toast("Login do Google não concluído","err")}}
 function gDrv(){try{var o=JSON.parse(localStorage.getItem(GTK)||"null");return!!(o&&o.s&&o.s.indexOf("drive.appdata")>=0)}catch(e){return false}}
 /* Login principal: Google Identity Services (janela pequena), sem sair do app. Reserva: redirecionamento (ex.: app da Tela de Início no iPhone) */
 var IOSPWA=window.navigator.standalone===true,GIS=null,GISM=0,GREN=0,GEXP=null;
 function lsg(k){try{return localStorage.getItem(k)}catch(e){return null}}
-function gisInit(){if(GIS||!(window.google&&google.accounts&&google.accounts.oauth2))return;try{GIS=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:GSCOPE,include_granted_scopes:true,callback:gisOk,error_callback:function(e){gisErr(e)}})}catch(e){GIS=null}}
+var GISC=null;function gisInit(){if(GIS||!(window.google&&google.accounts&&google.accounts.oauth2))return;try{GIS=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:GSCOPE,include_granted_scopes:true,callback:gisOk,error_callback:function(e){gisErr(e)}})}catch(e){GIS=null}try{GISC=google.accounts.oauth2.initCodeClient({client_id:GCID,scope:GSCOPE,include_granted_scopes:true,ux_mode:"popup",select_account:!(S.gcon||lsg("vp-sync-on")),callback:function(r){var m=GISM;GISM=0;if(r&&r.code)gExch(r.code,"postmessage",m||1);else gisErr({type:(r&&r.error)||"unknown"},1)},error_callback:function(e){gisErr(e)}})}catch(e){GISC=null}}
 function gSet(t,s,ex){try{localStorage.setItem(GTK,JSON.stringify({t:t,s:s||"",x:Date.now()+(+ex||3600)*1e3-6e4}))}catch(e){}gRen()}
 function gisOk(r){var man=GISM;GISM=0;if(!r||r.error||!r.access_token){gisErr({type:(r&&r.error)||"unknown"},man);return}gSet(r.access_token,r.scope||GSCOPE,r.expires_in);if(man==1)toast("Google conectado");rIf();cloudSync(man==1).then(function(){if(man==1||S.gcon)sync(man==1)})}
 function gisErr(e,man){if(man==null){man=GISM;GISM=0}var ty=(e&&e.type)||"";if(man!=1)return;if(ty=="popup_closed"||ty=="access_denied")toast("Login do Google não concluído","err");else gLoginR(false)}
 function gDrop(){try{localStorage.removeItem(GTK)}catch(e){}GREN=0;clearTimeout(GEXP)}
-function gRen(){clearTimeout(GEXP);GREN=0;var o=null;try{o=JSON.parse(localStorage.getItem(GTK)||"null")}catch(e){}if(!o||!o.x)return;var left=o.x-Date.now();if(left<=0)return;GEXP=setTimeout(function(){GREN=0;rIf()},Math.min(left+500,2e9));GREN=Date.now()+Math.max(0,left-8*6e4)}
+function gRen(){clearTimeout(GEXP);GREN=0;var o=null;try{o=JSON.parse(localStorage.getItem(GTK)||"null")}catch(e){}if(!o||!o.x)return;var left=o.x-Date.now();if(gRt()){GEXP=setTimeout(function(){gRefresh().then(function(t){if(!t)rIf()})},Math.max(1e3,left-5*6e4));return}if(left<=0)return;GEXP=setTimeout(function(){GREN=0;rIf()},Math.min(left+500,2e9));GREN=Date.now()+Math.max(0,left-8*6e4)}
 /* renovação sem tela: no PC, no primeiro clique depois de faltar 8 min pro token vencer (navegador só deixa abrir a janelinha com um clique) */
-document.addEventListener("pointerdown",function(e){if(!GREN||Date.now()<GREN||e.pointerType!="mouse"||!GIS||IOSPWA||GISM||!gTok())return;GREN=0;GISM=2;try{GIS.requestAccessToken({prompt:"none"})}catch(x){GISM=0}},true);
+document.addEventListener("visibilitychange",function(){if(document.visibilityState!="visible"||!gRt())return;var o=null;try{o=JSON.parse(localStorage.getItem(GTK)||"null")}catch(e){}if(!o||!o.x||o.x-Date.now()<10*6e4)gRefresh()});window.addEventListener("online",function(){if(gRt()&&!gTok())gRefresh().then(function(t){if(t)rIf()})});
+document.addEventListener("pointerdown",function(e){if(gRt()||!GREN||Date.now()<GREN||e.pointerType!="mouse"||!GIS||IOSPWA||GISM||!gTok())return;GREN=0;GISM=2;try{GIS.requestAccessToken({prompt:"none"})}catch(x){GISM=0}},true);
 function rIf(){if(typeof render!="function")return;if(!busyUI())render();else CS.dirty=1}
-function gNeed(){return!gTok()&&(S.gcon||!!lsg("vp-sync-on"))}
+function gNeed(){return!gTok()&&!gRt()&&(S.gcon||!!lsg("vp-sync-on"))}
 function gBanner(){return gNeed()?'<div class="grp note bad" style="margin-bottom:14px">'+ic("warn")+'<div class="grow"><b>Conexão com o Google venceu</b><div class="s">Toque para reconectar e continuar sincronizando.</div></div><button class="btn sm" onclick="gLogin()">Reconectar</button></div>':""}
 function gLogin(sil){if(!navigator.onLine){if(!sil)toast("Sem internet. Conecte para entrar no Google","err");return}
- if(!sil&&GIS&&!IOSPWA){GISM=1;try{GIS.requestAccessToken({prompt:(S.gcon||lsg("vp-sync-on"))?"":"select_account"});return}catch(e){GISM=0}}
+ if(!sil&&GISC&&!IOSPWA){GISM=1;try{GISC.requestCode();return}catch(e){GISM=0}}
  gLoginR(sil)}
 function gLoginR(sil){var st=Math.random().toString(36).slice(2)+Date.now().toString(36);try{localStorage.setItem("vp-gst",st)}catch(e){}
  var r=location.origin+location.pathname.replace(/index\.html$/,"");
- location.href="https://accounts.google.com/o/oauth2/v2/auth?client_id="+encodeURIComponent(GCID)+"&redirect_uri="+encodeURIComponent(r)+"&response_type=token&include_granted_scopes=true&prompt="+(sil?"none":"select_account")+"&scope="+encodeURIComponent(GSCOPE)+"&state="+encodeURIComponent(st+"|"+(typeof tab=="string"?tab:"painel")+(sil?"|s":""))}
-function gOut(){try{[GTK,"vp-sync-on","vp-gcache","vp-dfid","vp-sil","vp-gst","vp-rms"].forEach(function(k){localStorage.removeItem(k)})}catch(e){}gDrop();S.gcon=false;G=[];GLAST=0;gstat="idle";CS.last=0;CS.err="";CS.pend=0;RMS={};AEV=null;save();render();toast("Google desconectado")}
+ location.href="https://accounts.google.com/o/oauth2/v2/auth?client_id="+encodeURIComponent(GCID)+"&redirect_uri="+encodeURIComponent(r)+"&response_type=code&access_type=offline&include_granted_scopes=true&prompt="+(sil?"none":"consent")+"&scope="+encodeURIComponent(GSCOPE)+"&state="+encodeURIComponent(st+"|"+(typeof tab=="string"?tab:"painel")+(sil?"|s":""))}
+function gOut(){var rt=gRt();if(rt)gW("/revoke",{rt:rt}).catch(function(){});try{[GRT,GTK,"vp-sync-on","vp-gcache","vp-dfid","vp-sil","vp-gst","vp-rms"].forEach(function(k){localStorage.removeItem(k)})}catch(e){}gDrop();S.gcon=false;G=[];GLAST=0;gstat="idle";CS.last=0;CS.err="";CS.pend=0;RMS={};AEV=null;save();render();toast("Google desconectado")}
 /* 403/429 por limite de uso não é login vencido */
 async function gErr(r,cal){var rs="";try{var j=await r.json();rs=(((j.error||{}).errors||[])[0]||{}).reason||(j.error&&j.error.status)||""}catch(e){}if(r.status==429||/rate|quota|limit|exhausted/i.test(rs))return{code:"rate",s:r.status};return{code:cal?"not_granted":"auth",s:r.status}}
-async function gApi(path,opt){var t=gTok();if(!t)throw{code:"auth"};opt=opt||{};opt.headers=Object.assign({Authorization:"Bearer "+t},opt.headers||{});
- var r=await fetch("https://www.googleapis.com/calendar/v3/"+path,opt);if(r.status==401){gDrop();throw{code:"auth"}}if(r.status==403||r.status==429)throw await gErr(r,1);if(!r.ok)throw{code:"http",s:r.status};if(r.status==204)return{};var tx=await r.text();return tx?JSON.parse(tx):{}}
+async function gApi(path,opt,_r){var t=await gTokA();if(!t)throw{code:"auth"};opt=opt||{};opt.headers=Object.assign({},opt.headers||{},{Authorization:"Bearer "+t});
+ var r=await fetch("https://www.googleapis.com/calendar/v3/"+path,opt);if(r.status==401){gDrop();if(!_r&&gRt())return gApi(path,opt,1);throw{code:"auth"}}if(r.status==403||r.status==429)throw await gErr(r,1);if(!r.ok)throw{code:"http",s:r.status};if(r.status==204)return{};var tx=await r.text();return tx?JSON.parse(tx):{}}
 function rfc(x){var d=new Date(x);return d.toISOString()}
 var GTZ=(Intl.DateTimeFormat().resolvedOptions().timeZone)||"America/Sao_Paulo";
 var GCLIENT={callTool:async function(svc,name,a){
@@ -592,7 +602,7 @@ function gJ(m,b){return{method:m,headers:{"Content-Type":"application/json"},bod
 async function gDel(id){try{await gApi("calendars/primary/events/"+encodeURIComponent(id),{method:"DELETE"});return true}catch(x){if(x&&x.code=="http"&&(x.s==404||x.s==410))return false;throw x}}
 async function gUp(o){var b=evBody(o),id=rid(o.k);try{return await gApi("calendars/primary/events",gJ("POST",Object.assign({id:id},b)))}catch(x){if(x&&x.code=="http"&&x.s==409){b.status="confirmed";return gApi("calendars/primary/events/"+id,gJ("PATCH",b))}throw x}}
 async function gUpd(o){try{var r=await gApi("calendars/primary/events/"+rid(o.k),gJ("PATCH",evBody(o)));return r&&r.status=="cancelled"?{gone:1}:r}catch(x){if(x&&x.code=="http"&&(x.s==404||x.s==410))return null;throw x}}
-async function getM(login){if(gTok())return GCLIENT;if(login)gLogin();return null}
+async function getM(login){if(await gTokA())return GCLIENT;if(login)gLogin();return null}
 /* Mesmos dados no PC e no celular: cópia numa pasta escondida do Google Drive (appDataFolder) */
 var CS={busy:false,last:0,err:"",tm:null,pend:0,again:0},DF="volta-aos-palcos-dados.json",LOCALK={gcon:1,demoBH:1};
 function merge(a,b){var n=(a._t||0)>=(b._t||0)?a:b,o=n===a?b:a,del=Object.assign({},o._del||{},n._del||{}),r=JSON.parse(JSON.stringify(n)),K=Object.assign({},o._k||{},n._k||{});
@@ -604,8 +614,8 @@ function merge(a,b){var n=(a._t||0)>=(b._t||0)?a:b,o=n===a?b:a,del=Object.assign
  var cut=Date.now()-400*864e5;Object.keys(del).forEach(function(k){if(del[k]<cut)delete del[k]});r._del=del;r._k=K;r._t=Math.max(a._t||0,b._t||0);return r}
 function strip(o){var c=JSON.parse(JSON.stringify(o));Object.keys(LOCALK).forEach(function(k){delete c[k]});return c}
 var DRV="https://www.googleapis.com/drive/v3/files/";
-async function dApi(url,opt){var t=gTok();if(!t||!gDrv())throw{code:"auth"};opt=opt||{};opt.headers=Object.assign({Authorization:"Bearer "+t},opt.headers||{});var r=await fetch(url,opt);
-  if(r.status==401){gDrop();throw{code:"auth"}}if(r.status==403||r.status==429)throw await gErr(r,0);if(!r.ok)throw{code:"http",s:r.status};return r}
+async function dApi(url,opt,_r){var t=await gTokA();if(!t||!gDrv())throw{code:"auth"};opt=opt||{};opt.headers=Object.assign({},opt.headers||{},{Authorization:"Bearer "+t});var r=await fetch(url,opt);
+  if(r.status==401){gDrop();if(!_r&&gRt())return dApi(url,opt,1);throw{code:"auth"}}if(r.status==403||r.status==429)throw await gErr(r,0);if(!r.ok)throw{code:"http",s:r.status};return r}
 async function dGet(id){return (await dApi(DRV+id+"?alt=media")).json()}
 async function dVer(id){var j=await (await dApi(DRV+id+"?fields=version")).json();return String(j.version||"")}
 async function dFindAll(){var j=await (await dApi("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&orderBy=createdTime&fields=files(id,name)&q="+encodeURIComponent("name='"+DF+"'"))).json();return(j.files||[]).map(function(f){return f.id})}
@@ -615,7 +625,7 @@ async function dPut(id,obj){var body=JSON.stringify(strip(obj)),ka=document.visi
 function busyUI(){var a=document.activeElement;return $("sh").classList.contains("on")||(a&&(a.tagName=="INPUT"||a.tagName=="TEXTAREA"||a.tagName=="SELECT"))}
 /* Junta com o arquivo do Drive. Se outro aparelho gravou no meio (versão mudou), relê e junta de novo antes de gravar */
 async function cloudSync(manual){if(CS.busy){CS.again=Math.max(CS.again||0,manual?2:1);return}if(!navigator.onLine){if(manual)toast("Sem internet agora","err");return}
-  if(!gTok()||!gDrv()){if(manual)gLogin();return}
+  if(!(await gTokA())||!gDrv()){if(manual)gLogin();return}
   CS.busy=true;CS.pend=0;csUpd();try{var id=null,done=false;try{id=localStorage.getItem("vp-dfid")}catch(e){}
    for(var tr=0;tr<3&&!done;tr++){var rem=null,extra=[],ver="";
     if(id){try{ver=await dVer(id);rem=await dGet(id)}catch(x){if(x&&x.code=="http"&&x.s==404){id=null;ver=""}else throw x}}
@@ -1427,7 +1437,7 @@ function perfBlock(){return'<div class="grp"><div class="row"><div class="grow">
   dx=Math.max(-150,Math.min(150,mx));r0.style.setProperty("--sw",dx+"px");r0.classList.toggle("swr",dx>0);r0.classList.toggle("swl",dx<0);r0.classList.toggle("swok",Math.abs(dx)>90)},{passive:true});
  function end(){if(!r0)return;var r=r0,d=dx,t=id,was=on;r0=null;if(!was)return;sw=true;setTimeout(function(){sw=false},80);r.classList.remove("swp");r.classList.add("rel");r.style.setProperty("--sw","0px");setTimeout(function(){r.classList.remove("rel","swr","swl","swok")},520);if(d>90){tg(t);swOk()}else if(d<-90){dl(t);swOk()}}
  document.addEventListener("pointerup",end);document.addEventListener("pointercancel",end);document.addEventListener("click",function(e){if(sw){e.stopPropagation();e.preventDefault()}},true)})();
-render();if(window.__gok){setTimeout(function(){cloudSync(window.__gok==1).then(function(){if(window.__gok==1||S.gcon)sync(window.__gok==1)})},300)}else if(window.__gerr)toast("Login do Google não concluído","err");else{setTimeout(function(){cloudSync(false)},400);if(S.gcon)setTimeout(function(){sync(false)},900)}
+render();if(window.__gcode)gExch(window.__gcode,GRDR,1);else if(window.__gok){setTimeout(function(){cloudSync(window.__gok==1).then(function(){if(window.__gok==1||S.gcon)sync(window.__gok==1)})},300)}else if(window.__gerr)toast("Login do Google não concluído","err");else{setTimeout(function(){cloudSync(false)},400);if(S.gcon)setTimeout(function(){sync(false)},900)}
 gRen();gisInit();
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer onload="gisInit()"></script>
