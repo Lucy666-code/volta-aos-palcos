@@ -164,7 +164,7 @@ nav#nav a:active .i{transform:scale(.8)!important;transition-duration:.12s!impor
 .ohero .os div{font-size:max(11px,calc(12px*var(--fs)));color:var(--mu)}
 .ohero .os b{display:block;color:#fff;font-size:max(12px,calc(20px*var(--fs)));letter-spacing:-.02em}
 .ring2{flex:none;filter:drop-shadow(0 0 14px var(--acm))}
-.ring2 .rv{transition:stroke-dasharray 1s var(--e-out)}
+.ring2 .rgv{transition:stroke-dasharray 1s var(--e-out)}
 .gc2{padding:0;overflow:hidden}
 .gc2 .gch{display:flex;gap:14px;align-items:center;padding:16px 10px 14px 16px;cursor:pointer}
 .gc2 .gch .t{font-size:max(11px,calc(18px*var(--fs)));font-weight:650;letter-spacing:-.02em}

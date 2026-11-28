@@ -206,7 +206,7 @@ body.sho #app{transform:scale(.93);border-radius:28px}
 .mhs i{width:8px;height:8px;border-radius:50%;background:#ffc24b}
 .mhs i.ok{background:var(--ok)}
 .mdn{flex:none;filter:drop-shadow(0 0 16px color-mix(in srgb,var(--ok) 35%,transparent))}
-.mdn .rv{transition:stroke-dasharray 1s var(--e5)}
+.mdn .rgv{transition:stroke-dasharray 1s var(--e5)}
 .v5mb{padding:16px 18px!important}
 
 @media (prefers-reduced-motion:reduce){#app.v5in>*,.air,.v5pi,.rt i,.cb i{animation:none!important}.v5ai::after,.aio,.aio i{animation:none}#dock .dp,#dock a,#dock a span{transition:none}body.sho #app{transform:none}}
@@ -310,3 +310,63 @@ body.sho #app{transform:scale(.93);border-radius:28px}
 #app.v5in .grp>.row{animation:none!important}
 @keyframes h1in{from{transform:translateY(8px)}to{transform:none}}
 #app.v5in .hdl h1{animation:h1in .45s var(--e5o) both!important}
+
+/* ---------- troca de tela em cross-fade ---------- */
+.v5ghost,.v5ghost *{animation:none!important;transition:none!important}
+.v5ghost{will-change:opacity,transform}
+@keyframes v5rise{from{transform:translate3d(calc(var(--d5,0)*22px),0,0)}to{transform:none}}
+#app.v5in>*{animation:v5rise .34s cubic-bezier(.2,.8,.2,1) both!important;animation-delay:0s!important}
+
+/* ---------- Aparência (Ajustes) ---------- */
+.v5ap{padding:6px 16px 14px!important}
+.apr{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.apr:last-child{border:0;padding-bottom:2px}
+.apl{font-weight:650;font-size:max(11px,calc(14px*var(--fs)));margin-bottom:10px}
+.acs2{display:flex;flex-wrap:wrap;gap:10px}
+.acb2{position:relative;width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;background:var(--c);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -6px 10px rgba(0,0,0,.25),0 4px 12px -4px var(--c);transition:transform .4s var(--e5)}
+.acb2.on{box-shadow:0 0 0 3px #0b0b0e,0 0 0 5px var(--c),0 0 22px -2px var(--c)}
+.acb2:hover{transform:scale(1.1)}
+.acb2.any{display:grid;place-items:center;background:conic-gradient(#ff4d6d,#ffd23f,#3dff8f,#4fd8ff,#a78bfa,#ff4d6d);color:#fff}
+.acb2.any .i{width:18px;height:18px;margin:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.acb2.any input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.apseg{display:flex;flex-wrap:wrap;gap:6px;padding:4px;border-radius:14px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.apseg button{flex:1 1 auto;padding:10px 12px;border:0;border-radius:10px;background:none;color:var(--mu);font:600 13px inherit;font-family:inherit;cursor:pointer;transition:background .3s,color .3s,box-shadow .3s}
+.apseg button.on{color:#050507;background:var(--ac);box-shadow:0 4px 14px -4px var(--acg)}
+.apseg button:not(.on):hover{color:#fff;background:rgba(255,255,255,.06)}
+.aptg{display:flex;flex-direction:column;gap:6px}
+.aptg button{display:flex;align-items:center;gap:12px;padding:11px 12px;border:0;border-radius:12px;background:rgba(255,255,255,.035);color:var(--mu);font:600 13.5px inherit;font-family:inherit;text-align:left;cursor:pointer}
+.aptg button i{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.2)}
+.aptg button.on{color:#fff}
+.aptg button.on i{background:var(--ac);box-shadow:0 0 12px -2px var(--acg)}
+.aptg button i .i{width:14px;height:14px;margin:0;color:#050507}
+
+/* fundo */
+body[data-ubg=soft] .stage img,body[data-ubg=soft] .stage canvas.rdy{opacity:.22!important}
+body[data-ubg=dark] .stage img,body[data-ubg=dark] .stage canvas,body[data-ubg=aurora] .stage img,body[data-ubg=aurora] .stage canvas{opacity:0!important}
+body[data-ubg=aurora] .stage{background:radial-gradient(60% 45% at 15% 5%,color-mix(in srgb,var(--ac) 30%,transparent),transparent 70%),radial-gradient(55% 45% at 90% 30%,rgba(138,107,255,.22),transparent 70%),radial-gradient(70% 50% at 50% 110%,color-mix(in srgb,var(--ac) 18%,transparent),transparent 70%),#030305}
+body[data-ubg=aurora] .stage::after{content:"";position:absolute;inset:-20%;background:radial-gradient(40% 30% at 30% 40%,color-mix(in srgb,var(--ac) 14%,transparent),transparent 70%);animation:v5aur 18s ease-in-out infinite alternate}
+@keyframes v5aur{to{transform:translate3d(25%,15%,0) scale(1.2)}}
+/* brilho suave da cor no topo (todas as telas) */
+body:not([data-ubg=dark]) .stage::before{content:"";position:absolute;left:0;right:0;top:0;height:300px;z-index:2;pointer-events:none;background:radial-gradient(60% 100% at 50% 0%,color-mix(in srgb,var(--ac) 13%,transparent),transparent 70%)}
+/* animações */
+body[data-uanim=off] *,body[data-uanim=off] *::before,body[data-uanim=off] *::after{animation:none!important;transition:none!important}
+body[data-uanim=soft] .aio .ob b,body[data-uanim=soft] .aio::after,body[data-uanim=soft] .aio svg,body[data-uanim=soft] .v5ai::after,body[data-uanim=soft] .air.bad .aii,body[data-uanim=soft] .bpw,body[data-uanim=soft] .aib.hot,body[data-uanim=soft] .aur,body[data-uanim=soft] .stage canvas#bgc,body[data-uanim=soft] .day.today,body[data-uanim=soft] .stage::after{animation:none!important}
+/* cantos */
+body[data-urad=round] #app .grp,body[data-urad=round] .v5bp,body[data-urad=round] .v5k{border-radius:30px!important}
+body[data-urad=round] #app .btn{border-radius:99px!important}
+body[data-urad=square] #app .grp,body[data-urad=square] .v5bp,body[data-urad=square] .sheet .fc{border-radius:10px!important}
+body[data-urad=square] #app .btn,body[data-urad=square] #app .chip,body[data-urad=square] .v5k,body[data-urad=square] .kp,body[data-urad=square] .air,body[data-urad=square] input{border-radius:8px!important}
+body[data-urad=square] #dock,body[data-urad=square] #dock .dp,body[data-urad=square] #dock a{border-radius:14px!important}
+/* espaçamento */
+body[data-udens=compact] #app .grp{margin-bottom:10px!important}
+body[data-udens=compact] #app .row{padding-top:9px!important;padding-bottom:9px!important;min-height:0!important}
+body[data-udens=compact] #app h2{margin-top:18px!important;margin-bottom:8px!important}
+body[data-udens=compact] .air{padding:9px 10px!important}
+/* barra de navegação */
+body[data-udock=all] #dock a{flex-direction:column;gap:3px;font-size:10px!important}
+body[data-udock=all] #dock a span{max-width:none;opacity:1;transform:none}
+body[data-udock=all] #dock a.on,body[data-udock=icons] #dock a.on{flex-grow:1}
+body[data-udock=icons] #dock a span{display:none}
+@media (min-width:1100px){body[data-udock=icons] #dock a{height:58px}}
+/* seções do painel */
+body.v5h-ai[data-tab=painel] .v5ai,body.v5h-cd[data-tab=painel] .cds,body.v5h-rdr[data-tab=painel] .rdr,body.v5h-mq[data-tab=painel] .mq{display:none!important}
